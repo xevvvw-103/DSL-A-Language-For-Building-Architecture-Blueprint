@@ -55,6 +55,27 @@ Use this file to commit information clearly documenting your check-ins' content.
 
 ![Sample output](sample%20output.png)
 
+![Example image](example.png)
+The following code shows how the above image might be represented.
+
+``` md
+<Bedroom>
+ <Bed width=180 height=240 />
+ # Note that x is relative to the position of the room, the x guarantees that the closet will always be on the left wall
+ <Closet width=40 height=160 x=0/>
+</Bedroom>
+# and etc for Balcony, Main, Bathroom ...
+
+<Floor>
+ <Balcony x=0 y=219 width=201 height=472 />
+ <Main x=201 y=0 width=544 height=691 />
+ <Bathroom x=745 y=0 width=163 height=283 />
+ <Utility x=908 y=0 width=198 height=283 />
+ <Hallway x=745 y=283 width=361 height=120 />
+ <Bedroom x=745 y=403 width=361 height=286 />
+</Floor>
+```
+
 ---
 
 ## **Note any important changes/feedback from TA discussion.**
