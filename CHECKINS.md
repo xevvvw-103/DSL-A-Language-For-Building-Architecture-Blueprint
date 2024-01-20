@@ -18,6 +18,7 @@ Use this file to commit information clearly documenting your check-ins' content.
 - Ability to place floors in a building
 - Each floor can have a layout of multiple rooms
 - Each room can have a layout of furniture and color settings
+- Procedurally generate room based on parameters (e.g. specify 1 bed, 1 couch, and you can generate multiple layouts based on that)
 
 ---
 
