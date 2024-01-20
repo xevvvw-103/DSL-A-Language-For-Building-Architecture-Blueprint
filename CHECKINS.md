@@ -55,7 +55,7 @@ Use this file to commit information clearly documenting your check-ins' content.
 
 ![Sample output](sample%20output.png)
 
-![Example image](example.png)
+![Example image](example.png) \
 The following code shows how the above image might be represented. All units are in cm.
 
 ``` md
