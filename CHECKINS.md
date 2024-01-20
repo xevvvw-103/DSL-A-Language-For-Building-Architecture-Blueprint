@@ -74,6 +74,11 @@ The following code shows how the above image might be represented. All units are
  <Utility x=908 y=0 width=198 height=283 />
  <Hallway x=745 y=283 width=361 height=120 />
  <Bedroom x=745 y=403 width=361 height=286 />
+ <Door connects=[Utility, Bathroom] />
+ <Door connects=[Bathroom, Hallway] />
+ <Door connects=[Bedroom, Hallway] />
+ <Door connects=[Main, Hallway] type=open />
+ <Door connects=[Main, Balcony] type=double />
 </Floor>
 ```
 
