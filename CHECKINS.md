@@ -7,3 +7,5 @@ Use this file to commit information clearly documenting your check-ins' content.
 [Check-in 1](./check-ins/CHECK-IN%201.md)
 
 [Check-in 2](./check-ins/CHECK-IN%202.md)
+
+[Check-in 3](./check-ins/CHECK-IN%203.md)

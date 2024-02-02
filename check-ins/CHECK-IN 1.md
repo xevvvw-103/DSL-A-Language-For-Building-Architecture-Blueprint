@@ -1,4 +1,4 @@
-# *Check-in 1*
+# Check-in 1
 
 ---
 
