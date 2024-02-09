@@ -9,3 +9,5 @@ Use this file to commit information clearly documenting your check-ins' content.
 [Check-in 2](./check-ins/CHECK-IN%202.md)
 
 [Check-in 3](./check-ins/CHECK-IN%203.md)
+
+[Check-in 4](./check-ins/CHECK-IN%204.md)
