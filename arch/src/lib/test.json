@@ -8,10 +8,17 @@
 		"furniture": [
 			{
 				"type": "chair",
-				"x": 103,
-				"y": 102,
-				"width": 100,
-				"height": 100
+				"x": 100,
+				"y": 100,
+				"width": 20,
+				"height": 20
+			},
+			{
+				"type": "sofa",
+				"x": 140,
+				"y": 100,
+				"width": 50,
+				"height": 20
 			}
 		]
 	}
