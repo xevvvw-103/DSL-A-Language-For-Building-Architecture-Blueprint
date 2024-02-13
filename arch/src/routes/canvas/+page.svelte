@@ -25,11 +25,11 @@
 		let json = await fetch("src/lib/test.json").then((r) => r.json());
 		console.log(json[0]);
 		json.forEach((room: any) => {
-			room.furniture.forEach((door: any) => {
+			room.furniture.forEach((obj: any) => {
 				let img = new Image();
-				img.src = "src/lib/images/" + door.type + ".png";
+				img.src = "src/lib/images/" + obj.type + ".png";
 				img.onload = function () {
-					ctx.drawImage(img, door.x, door.y, door.width, door.height);
+					ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
 				};
 			});
 			roomCtx.strokeRect(room.x, room.y, room.width, room.height);
