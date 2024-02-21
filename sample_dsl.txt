@@ -1,0 +1,50 @@
+DIRECTION = (LEFT || RIGHT || UP || DOWN)
+
+MAKE (room || bed || chair || table) NAMED (object_name) SIZE (w,h)
+// Reject when name == FLOOR
+
+
+ADD (object_name) TO (room_name || FLOOR) AT (x,y) FACING DIRECTION
+
+RESIZE (object_name) (w,h)
+
+REPEAT DIRECTION statement
+
+
+-------------------USAGE-------------------
+
+// Construct a room of size 200*500 
+MAKE room NAMED r1 SIZE 200*500
+
+ADD r1 TO FLOOR AT (x,y)
+
+// Resize
+RESIZE r1 100*400
+
+// Error, object not exists
+RESIZE r2 200*300
+
+// Construct a bed and a chair
+MAKE chair NAMED c1 SIZE 50*50 
+MAKE bed NAMED b1 SIZE 100*50
+
+// Decorate r1
+ADD c1 TO r1 AT (x+50, y+100) FACING RIGHT
+ADD b1 TO r1 AT (x,y) FACING LEFT
+
+// Dynamic part of DSL
+REPEAT RIGHT ADD c1 to r1 AT (x,y+200)
+
+---------------------------------------
+MAKE room NAMED r1 SIZE 100,100
+
+MAKE chair NAMED c1 SIZE 5,5
+
+ADD r1 TO FLOOR AT 1,1
+ADD c1 TO r1 AT 0,0
+
+RESIZE r1 50,50
+
+ADD c1 TO r1 AT 0,0
+
+REPEAT RIGHT ADD c1 TO r1 AT 0,50

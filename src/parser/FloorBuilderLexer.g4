@@ -1,0 +1,29 @@
+lexer grammar FloorBuilderLexer;
+
+// DEFAULT_MODE
+MAKE_STATEMENT_START: 'MAKE';
+ROOM: 'room';
+FURNITURE: 'chair' | 'bed' | 'table' | 'couch';
+NAME_DECLARE: 'NAMED';
+SIZE_DECLARE: 'SIZE';
+COMMA: ',';
+
+ADD_STATEMENT_START: 'ADD';
+TO: 'TO';
+AT: 'AT';
+FACING: 'FACING';
+DIRECTION: 'LEFT' | 'RIGHT' | 'UP' | 'DOWN';
+
+RESIZE_STATEMENT_START: 'RESIZE';
+
+REPEAT_STATEMENT_START: 'REPEAT';
+TIMES: 'TIMES';
+
+REMOVE_STATEMENT_START: 'REMOVE';
+FROM: 'FROM';
+
+WS : [\r\n\t ] -> channel(HIDDEN);
+NUM: [0-9]+;
+
+FLOOR: 'FLOOR';
+STR: ([a-zA-Z][0-9a-zA-Z])+;
