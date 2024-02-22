@@ -21,6 +21,6 @@ export default class ResizeStatement extends Statement {
         return this.height;
     }
     accept(v, t) {
-        return v.visitRepeatStatement(this, t);
+        return v.visitResizeStatement(this, t);
     }
 }

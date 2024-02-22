@@ -6,7 +6,7 @@ export default class ParseTreeToAST extends FloorBuilderParserVisitor {
   visitProgram(ctx) {
     var statements = [];
     // console.log(ctx.statement());
-    ctx.statement().forEach((s) => statements.push(s.accept(this)));
+    ctx.statement().forEach((s) => statements.push(...s.accept(this)));
     // for( let s in ctx.statement()) {
     //   statements.add(s.accept(this));
     // }
@@ -22,7 +22,7 @@ export default class ParseTreeToAST extends FloorBuilderParserVisitor {
   visitMake_statement(ctx) {
     if (ctx.object_type().getText() === ast.OBJECT_TYPE.ROOM) {
       return new ast.MakeRoom(
-        ctx.name().getText,
+        ctx.name().getText(),
         Number(ctx.width().getText()),
         Number(ctx.height().getText())
       );
@@ -58,7 +58,6 @@ export default class ParseTreeToAST extends FloorBuilderParserVisitor {
 
   // Visit a parse tree produced by FloorBuilderParser#add_statement.
   visitAdd_statement(ctx) {
-    // console.log(ctx.target().getText);
     if (ctx.target().getText() === ast.OBJECT_TYPE.FLOOR) {
       return new ast.AddToFloor(
         ctx.name().getText(),
@@ -100,9 +99,9 @@ export default class ParseTreeToAST extends FloorBuilderParserVisitor {
   // Visit a parse tree produced by FloorBuilderParser#resize_statement.
   visitResize_statement(ctx) {
     return new ast.ResizeStatement(
-      ctx.name().getText,
-      ctx.width().getText(),
-      ctx.height().getText()
+      ctx.name().getText(),
+      Number(ctx.width().getText()),
+      Number(ctx.height().getText())
     );
   }
 
@@ -110,7 +109,7 @@ export default class ParseTreeToAST extends FloorBuilderParserVisitor {
   visitRepeat_statement(ctx) {
     return new ast.RepeatStatement(
       ctx.direction().getText(),
-      ctx.repeatable_statement().accept(this),
+      ctx.repeatable_statement().accept(this)[0],
       ctx.times() ? Number(ctx.times().getText()) : 0
     );
   }

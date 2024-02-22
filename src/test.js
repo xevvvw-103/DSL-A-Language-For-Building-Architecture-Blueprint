@@ -5,6 +5,7 @@ import antlr4 from "antlr4";
 import console from "console";
 import fs from 'fs';
 import ParseTreeToAST from "./parser/ParseTreeToAST.js";
+import Printer from "./ast/visitors/Printer.js";
 
 // read from input
 const inputFilePath = './input.txt';
@@ -27,4 +28,10 @@ const v = new ParseTreeToAST();
 
 const program = v.visitProgram(t);
 console.log(program);
+
+// example of running a new visitor
+/* 
+let printer = new Printer();
+printer.print(program);
+*/
 
