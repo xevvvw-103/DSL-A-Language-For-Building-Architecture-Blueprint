@@ -29,9 +29,3 @@ const v = new ParseTreeToAST();
 const program = v.visitProgram(t);
 console.log(program);
 
-// example of running a new visitor
-/* 
-let printer = new Printer();
-printer.print(program);
-*/
-
