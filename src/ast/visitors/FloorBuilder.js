@@ -3,6 +3,7 @@ import * as ast from "../index.js";
 import * as fs from 'fs';
 import * as path from 'path';
 import { type } from "os";
+import { time } from "console";
 
 export default class FloorBuilder extends BaseVisitor {
   // Objects declared by Make_Statement
@@ -183,7 +184,69 @@ export default class FloorBuilder extends BaseVisitor {
     }
   }
 
-  visitRepeatStatement(v, t) { }
+  visitRepeatStatement(v, t) {
+    // REPEAT ADD TO ROOM
+    let times = v.times;
+
+    for (let i = 0; i < FloorBuilder.declared_objects.length; i++) {
+      if (FloorBuilder.declared_objects[i].name == v.repeatableStatement.name) {
+        var child_width = FloorBuilder.declared_objects[i].width;
+        var child_height = FloorBuilder.declared_objects[i].height;
+      }
+      if (FloorBuilder.declared_objects[i].name == v.repeatableStatement.target) {
+        var room_width = FloorBuilder.declared_objects[i].width;
+        var room_height = FloorBuilder.declared_objects[i].height;
+      }
+    }
+    // floor_list = [item]
+    // item: {name: , width: , height: , x: , y: , type: , direction: , childs: [item]}
+    switch (v.repeatableStatement.direction) {
+      case ast.DIRECTION.UP:
+        if (times == 0 || Math.floor(v.repeatableStatement.y / child_height) < times) {
+          times = Math.floor(v.repeatableStatement.y / child_height);
+        }
+
+        for (let i = 0; i < times; i++) {
+          v.repeatableStatement.y -= child_height;
+          v.repeatableStatement.accept(this, null);
+        }
+        break;
+      case ast.DIRECTION.LEFT:
+        if (times == 0 || Math.floor(v.repeatableStatement.x / child_width) < times) {
+          times = Math.floor(v.repeatableStatement.x / child_width);
+        }
+
+        for (let i = 0; i < times; i++) {
+          v.repeatableStatement.x -= child_width;
+          v.repeatableStatement.accept(this, null);
+        }
+        break;
+      case ast.DIRECTION.RIGHT:
+        if (times == 0 || Math.floor((room_width - v.repeatableStatement.x) / child_width) < times) {
+          times = Math.floor((room_width - v.repeatableStatement.x) / child_width);
+        }
+
+        for (let i = 0; i < times; i++) {
+          v.repeatableStatement.x += child_width;
+          v.repeatableStatement.accept(this, null);
+        }
+        break;
+      case ast.DIRECTION.DOWN:
+        if (times == 0 || Math.floor((room_height - v.repeatableStatement.y) / child_height) < times) {
+          times = Math.floor((room_height - v.repeatableStatement.y) / child_height);
+        }
+
+        for (let i = 0; i < times; i++) {
+          v.repeatableStatement.y += child_height;
+          v.repeatableStatement.accept(this, null);
+        }
+        break;
+      default:
+        // REPEAT REMOVE
+        // TODO
+        console.log(v.repeatableStatement);
+    }
+  }
 
   visitRemoveFromFloor(v, t) {
     let removable = false;
