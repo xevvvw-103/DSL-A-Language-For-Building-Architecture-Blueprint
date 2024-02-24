@@ -2,8 +2,7 @@ import BaseVisitor from "./BaseVisitor.js";
 import * as ast from "../index.js";
 import * as fs from 'fs';
 import * as path from 'path';
-import { type } from "os";
-import { time } from "console";
+
 
 export default class FloorBuilder extends BaseVisitor {
   // Objects declared by Make_Statement
@@ -185,7 +184,7 @@ export default class FloorBuilder extends BaseVisitor {
   }
 
   visitRepeatStatement(v, t) {
-    // REPEAT ADD TO ROOM
+    // REPEAT ADD 
     let times = v.times;
 
     for (let i = 0; i < FloorBuilder.declared_objects.length; i++) {
@@ -222,9 +221,10 @@ export default class FloorBuilder extends BaseVisitor {
         }
         break;
       case ast.DIRECTION.RIGHT:
-        if (times == 0 || Math.floor((room_width - v.repeatableStatement.x) / child_width) < times) {
+        if (v.repeatableStatement.target && (times == 0 || Math.floor((room_width - v.repeatableStatement.x) / child_width) < times)) 
+        {
           times = Math.floor((room_width - v.repeatableStatement.x) / child_width);
-        }
+        } 
 
         for (let i = 0; i < times; i++) {
           v.repeatableStatement.x += child_width;
@@ -232,7 +232,7 @@ export default class FloorBuilder extends BaseVisitor {
         }
         break;
       case ast.DIRECTION.DOWN:
-        if (times == 0 || Math.floor((room_height - v.repeatableStatement.y) / child_height) < times) {
+        if (v.repeatableStatement.target && (times == 0 || Math.floor((room_height - v.repeatableStatement.y) / child_height) < times)) {
           times = Math.floor((room_height - v.repeatableStatement.y) / child_height);
         }
 
@@ -242,9 +242,7 @@ export default class FloorBuilder extends BaseVisitor {
         }
         break;
       default:
-        // REPEAT REMOVE
-        // TODO
-        console.log(v.repeatableStatement);
+        console.log('REPEAT ERROR: Incorrect sentence: ' + v.repeatableStatement + '.');
     }
   }
 
