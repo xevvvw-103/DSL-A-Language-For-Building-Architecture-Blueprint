@@ -201,7 +201,7 @@ export default class FloorBuilder extends BaseVisitor {
     // item: {name: , width: , height: , x: , y: , type: , direction: , childs: [item]}
     switch (v.repeatableStatement.direction) {
       case ast.DIRECTION.UP:
-        if (times == 0 || Math.floor(v.repeatableStatement.y / child_height) < times) {
+        if (v.repeatableStatement.target && (times == 0 || Math.floor(v.repeatableStatement.y / child_height) < times)) {
           times = Math.floor(v.repeatableStatement.y / child_height);
         }
 
@@ -211,7 +211,7 @@ export default class FloorBuilder extends BaseVisitor {
         }
         break;
       case ast.DIRECTION.LEFT:
-        if (times == 0 || Math.floor(v.repeatableStatement.x / child_width) < times) {
+        if (v.repeatableStatement.target && (times == 0 || Math.floor(v.repeatableStatement.x / child_width) < times)) {
           times = Math.floor(v.repeatableStatement.x / child_width);
         }
 
