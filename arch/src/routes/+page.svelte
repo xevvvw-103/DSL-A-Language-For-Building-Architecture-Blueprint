@@ -1,59 +1,79 @@
-<script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+<script lang="ts">
+	import { onMount } from "svelte";
+	let width = 1000;
+	let height = 1000;
+	let canvas: HTMLCanvasElement;
+	let roomCanvas: HTMLCanvasElement;
+
+	function initCanvas(canvas: HTMLCanvasElement) {
+		let ctx = canvas.getContext("2d")!;
+		ctx.lineWidth = 3;
+		if (!ctx) {
+			throw new Error("Canvas not supported");
+		}
+		return ctx;
+	}
+
+	onMount(async () => {
+		function drawImage(img: any, item: any) {
+			ctx.setTransform(1, 0, 0, 1, item.position.x, item.position.y); // sets scale and origin
+			switch (item.direction) {
+				case "LEFT":
+					ctx.rotate(Math.PI / 2);
+					ctx.translate(0, -item.size.height);
+					break;
+				case "RIGHT":
+					ctx.rotate((3 * Math.PI) / 2);
+					ctx.translate(-item.size.width, 0);
+					break;
+				case "DOWN":
+					ctx.rotate(Math.PI);
+					ctx.translate(-item.size.width, -item.size.height);
+					break;
+				case "UP":
+					ctx.rotate(0);
+					break;
+			}
+			ctx.drawImage(img, 0, 0, item.size.width, item.size.height);
+		}
+
+		let ctx = initCanvas(canvas);
+		let roomCtx = initCanvas(roomCanvas);
+		if (!roomCtx) {
+			throw new Error("Canvas not supported");
+		}
+		roomCtx.lineWidth = 3;
+
+		let json = await fetch("src/lib/test.json").then((r) => r.json());
+		console.log(json[0]);
+
+		json.forEach((item: any) => {
+			if (item.type === "room") {
+				ctx.strokeRect(
+					item.position.x,
+					item.position.y,
+					item.size.width,
+					item.size.height,
+				);
+			} else {
+				let img = new Image();
+				img.src = "src/lib/images/" + item.type + ".png";
+				img.onload = () => {
+					drawImage(img, item);
+				};
+			}
+		});
+	});
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
-</svelte:head>
-
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
-</section>
+<canvas id="base" {width} {height} bind:this={canvas} />
+<canvas id="room" {width} {height} bind:this={roomCanvas} />
 
 <style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
+	canvas {
 		position: absolute;
-		width: 100%;
-		height: 100%;
+		left: 0;
 		top: 0;
-		display: block;
+		z-index: 0;
 	}
 </style>
