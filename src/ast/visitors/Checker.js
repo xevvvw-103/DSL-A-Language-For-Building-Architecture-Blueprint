@@ -36,6 +36,7 @@ export default class Checker extends BaseVisitor {
                          placements: []};
   }
   visitAddToRoom(v, c) {
+
     const objectName = v.name;
     if (!c[objectName]) {
       console.log(`Add to Rooom: Object with name ${objectName} does not exist.`);
@@ -81,7 +82,66 @@ export default class Checker extends BaseVisitor {
   }
 
   visitRepeatStatement(v, c) {
-    // TODO 
+    if(v.repeatableStatement.target === 'FLOOR' && v.times < 1) {
+      console.log(`Repeat: Times should be greater than 0 for FLOOR.`);
+    }
+    if (!c[v.repeatableStatement.name]) {
+      console.log(`Repeat: Object with name ${v.repeatableStatement.name} does not exist.`);
+    }
+    if (!c[v.repeatableStatement.target] && v.repeatableStatement.target !== 'FLOOR') {
+      console.log(`Repeat: Room with name ${v.repeatableStatement.target} does not exist.`);
+    }
+
+    let times = v.times;
+    var child_width = c[v.repeatableStatement.name].width;
+    var child_height = c[v.repeatableStatement.name].height;
+    var room_width = c[v.repeatableStatement.target].width;
+    var room_height = c[v.repeatableStatement.target].height;
+     switch (v.direction) {
+       case ast.DIRECTION.UP:
+         if (v.repeatableStatement.target && (times == 0 || Math.floor(v.repeatableStatement.y / child_height) < times)) {
+           times = Math.floor(v.repeatableStatement.y / child_height);
+         }
+ 
+         for (let i = 0; i < times; i++) {
+           v.repeatableStatement.y -= child_height;
+           v.repeatableStatement.accept(this, c);
+         }
+         break;
+       case ast.DIRECTION.LEFT:
+         if (v.repeatableStatement.target && (times == 0 || Math.floor(v.repeatableStatement.x / child_width) < times)) {
+           times = Math.floor(v.repeatableStatement.x / child_width);
+         }
+ 
+         for (let i = 0; i < times; i++) {
+           v.repeatableStatement.x -= child_width;
+           v.repeatableStatement.accept(this, c);
+         }
+         break;
+       case ast.DIRECTION.RIGHT:
+         if (v.repeatableStatement.target && (times == 0 || Math.floor((room_width - v.repeatableStatement.x) / child_width) < times)) 
+         {
+           times = Math.floor((room_width - v.repeatableStatement.x) / child_width);
+         } 
+ 
+         for (let i = 0; i < times; i++) {
+           v.repeatableStatement.x += child_width;
+           v.repeatableStatement.accept(this, c);
+         }
+         break;
+       case ast.DIRECTION.DOWN:
+         if (v.repeatableStatement.target && (times == 0 || Math.floor((room_height - v.repeatableStatement.y) / child_height) < times)) {
+           times = Math.floor((room_height - v.repeatableStatement.y) / child_height);
+         }
+ 
+         for (let i = 0; i < times; i++) {
+           v.repeatableStatement.y += child_height;
+           v.repeatableStatement.accept(this, c);
+         }
+         break;
+       default:
+         console.log('Repeat: Incorrect sentence: ' + v.repeatableStatement + '.');
+     }
   }
 
   visitRemoveFromFloor(v, c) {
