@@ -30,10 +30,11 @@ console.log("created parser");
 const v = new ParseTreeToAST();
 
 const program = v.visitProgram(t);
+const program2 = v.visitProgram(t);
 
 let checker = new Checker(); 
 checker.check(program);
 
 
 let new_visitor = new FloorBuilder(); 
-new_visitor.buildFloor(program);
+new_visitor.buildFloor(program2);
