@@ -27,11 +27,11 @@
 					ctx.translate(-item.size.width, 0);
 					break;
 				case "DOWN":
-					ctx.rotate(Math.PI);
-					ctx.translate(-item.size.width, -item.size.height);
+					ctx.rotate(0);
 					break;
 				case "UP":
-					ctx.rotate(0);
+					ctx.rotate(Math.PI);
+					ctx.translate(-item.size.width, -item.size.height);
 					break;
 			}
 			ctx.drawImage(img, 0, 0, item.size.width, item.size.height);
