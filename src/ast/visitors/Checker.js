@@ -13,9 +13,9 @@ export default class Checker extends BaseVisitor {
   visitMakeRoom(v, c) {
     const roomName = v.name;
     if (roomName === "FLOOR") 
-      console.log(`Room name cannot be FLOOR.`);
+      throw new Error("Make Room: Room name cannot be FLOOR.");
     else if (c[roomName]) {
-      console.log(`Room with name ${roomName} already exists.`);
+      throw new Error(`Make Room: Room with name ${roomName} already exists.`);
     }
     c[roomName] = { type: "room",  
                     width: v.width,
@@ -26,9 +26,9 @@ export default class Checker extends BaseVisitor {
   visitMakeFurniture(v, c) {
     const furnitureName = v.name;
     if (furnitureName === "FLOOR") 
-      console.log(`Room name cannot be FLOOR.`);
+      throw new Error(`Make Furniture: Room name cannot be FLOOR.`);
     if (c[furnitureName]) {
-      console.log(`Furniture with name ${furnitureName} already exists.`);
+      throw new Error(`Make Furniture: Furniture with name ${furnitureName} already exists.`);
     }
     c[furnitureName] = { type: "furniture",
                          width: v.width,
@@ -39,7 +39,7 @@ export default class Checker extends BaseVisitor {
 
     const objectName = v.name;
     if (!c[objectName]) {
-      console.log(`Add to Rooom: Object with name ${objectName} does not exist.`);
+      throw new Error(`Add to Rooom: Object with name ${objectName} does not exist.`);
     }
     // Check if the object can be placed without overlapping with other placements
     var overlapping = false;
@@ -49,7 +49,7 @@ export default class Checker extends BaseVisitor {
       }
     });
     if (overlapping) {
-      console.log(`Add to Room: Object with name ${objectName} cannot be placed at (${v.x}, ${v.y}) in room ${v.target} due to overlapping.`);
+      throw new Error(`Add to Room: Object with name ${objectName} cannot be placed at (${v.x}, ${v.y}) in room ${v.target} due to overlapping.`);
     } else {
       c[objectName].placements.push({target: v.target, x: v.x, y: v.y});
     }
@@ -57,7 +57,7 @@ export default class Checker extends BaseVisitor {
   visitAddToFloor(v, c) {
     const objectName = v.name;
     if (!c[objectName]) {
-      console.log(`Add to Floor: Object with name ${objectName} does not exist.`);
+      throw new Error(`Add to Floor: Object with name ${objectName} does not exist.`);
     }
 
     // Check if the object can be placed without overlapping with other placements
@@ -69,7 +69,7 @@ export default class Checker extends BaseVisitor {
     });
 
     if (overlapping) {
-      console.log(`Add to Floor: Object with name ${objectName} cannot be placed at (${v.x}, ${v.y}) due to overlapping.`);
+      throw new Error(`Add to Floor: Object with name ${objectName} cannot be placed at (${v.x}, ${v.y}) due to overlapping.`);
     } else {
       c[objectName].placements.push({target: 'FLOOR', x: v.x, y: v.y});
     }
@@ -77,26 +77,30 @@ export default class Checker extends BaseVisitor {
   visitResizeStatement(v, c) {
     const objectName = v.name;
     if (!c[objectName]) {
-      console.log(`Resize: Object with name ${objectName} does not exist.`);
+      throw new Error(`Resize: Object with name ${objectName} does not exist.`);
     }
   }
 
   visitRepeatStatement(v, c) {
-    if(v.repeatableStatement.target === 'FLOOR' && v.times < 1) {
-      console.log(`Repeat: Times should be greater than 0 for FLOOR.`);
+    if(v.repeatableStatement instanceof ast.AddToFloor && v.times < 1) {
+      throw new Error(`Repeat: Times should be greater than 0 for FLOOR.`);
     }
     if (!c[v.repeatableStatement.name]) {
-      console.log(`Repeat: Object with name ${v.repeatableStatement.name} does not exist.`);
+      throw new Error(`Repeat: Object with name ${v.repeatableStatement.name} does not exist.`);
     }
-    if (!c[v.repeatableStatement.target] && v.repeatableStatement.target !== 'FLOOR') {
-      console.log(`Repeat: Room with name ${v.repeatableStatement.target} does not exist.`);
+    if (!v.repeatableStatement instanceof ast.AddToFloor && !c[v.repeatableStatement.target]) {
+      throw new Error(`Repeat: Room with name ${v.repeatableStatement.target} does not exist.`);
     }
 
     let times = v.times;
     var child_width = c[v.repeatableStatement.name].width;
     var child_height = c[v.repeatableStatement.name].height;
-    var room_width = c[v.repeatableStatement.target].width;
-    var room_height = c[v.repeatableStatement.target].height;
+    var room_width = 0;
+    var room_height = 0;
+    if(c[v.repeatableStatement.target]) {
+      room_width = c[v.repeatableStatement.target].width;
+      room_height = c[v.repeatableStatement.target].height;
+    }
      switch (v.direction) {
        case ast.DIRECTION.UP:
          if (v.repeatableStatement.target && (times == 0 || Math.floor(v.repeatableStatement.y / child_height) < times)) {
@@ -147,10 +151,10 @@ export default class Checker extends BaseVisitor {
   visitRemoveFromFloor(v, c) {
     const objectName = v.target;
     if (!c[objectName]) {
-      console.log(`Remove from Floor: Object with name ${objectName} does not exist.`);
+      throw new Error(`Remove from Floor: Object with name ${objectName} does not exist.`);
     }
     if (c[objectName].placements.length === 0) {
-      console.log(`Remove from Floor: Object with name ${objectName} does not exist in the floor.`);
+      throw new Error(`Remove from Floor: Object with name ${objectName} does not exist in the floor.`);
     }
     var flg = 0;
     for( var i = 0; i < c[objectName].placements.length; i++){ 
@@ -160,13 +164,13 @@ export default class Checker extends BaseVisitor {
       }
     }
     if (flg === 0) {
-      console.log(`Remove from Floor: Object with name ${objectName} does not exist in the floor at the given position.`);
+      throw new Error(`Remove from Floor: Object with name ${objectName} does not exist in the floor at the given position.`);
     }
   }
   visitRemoveFromRoom(v, c) {
     const objectName = v.target;
     if (!c[objectName]) {
-      console.log(`Remove from Room: Object with name ${objectName} does not exist.`);
+      throw new Error(`Remove from Room: Object with name ${objectName} does not exist.`);
     }
     var flg = 0;
     for( var i = 0; i < c[objectName].placements.length; i++){ 
@@ -176,14 +180,14 @@ export default class Checker extends BaseVisitor {
       }
     }
     if (flg === 0) {
-      console.log(`Remove from Floor: Object with name ${objectName} does not exist in the room ${v.base} at the given position.`);
+      throw new Error(`Remove from Floor: Object with name ${objectName} does not exist in the room ${v.base} at the given position.`);
     }
   }
 
   visitResizeStatement(v, c) {
     const objectName = v.name;
     if (!c[objectName]) {
-      console.log(`Resize: Object with name ${objectName} does not exist.`);
+      throw new Error(`Resize: Object with name ${objectName} does not exist.`);
     }
 
 
