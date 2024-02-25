@@ -205,8 +205,8 @@ export default class FloorBuilder extends BaseVisitor {
           times = Math.floor(v.repeatableStatement.y / child_height);
         }
         for (let i = 0; i < times; i++) {
-          v.repeatableStatement.y -= child_height;
           v.repeatableStatement.accept(this, null);
+          v.repeatableStatement.y -= child_height;
         }
         break;
       case ast.DIRECTION.LEFT:
@@ -214,8 +214,8 @@ export default class FloorBuilder extends BaseVisitor {
           times = Math.floor(v.repeatableStatement.x / child_width);
         }
         for (let i = 0; i < times; i++) {
-          v.repeatableStatement.x -= child_width;
           v.repeatableStatement.accept(this, null);
+          v.repeatableStatement.x -= child_width;
         }
         break;
       case ast.DIRECTION.RIGHT:
@@ -224,8 +224,8 @@ export default class FloorBuilder extends BaseVisitor {
           times = Math.floor((room_width - v.repeatableStatement.x) / child_width);
         } 
         for (let i = 0; i < times; i++) {
-          v.repeatableStatement.x += child_width;
           v.repeatableStatement.accept(this, null);
+          v.repeatableStatement.x += child_width;
         }
         break;
       case ast.DIRECTION.DOWN:
@@ -233,8 +233,8 @@ export default class FloorBuilder extends BaseVisitor {
           times = Math.floor((room_height - v.repeatableStatement.y) / child_height);
         }
         for (let i = 0; i < times; i++) {
-          v.repeatableStatement.y += child_height;
           v.repeatableStatement.accept(this, null);
+          v.repeatableStatement.y += child_height;
         }
         break;
       default:
