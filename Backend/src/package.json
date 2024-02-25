@@ -1,9 +1,9 @@
 {
   "type": "module",
   "scripts": {
-    "start": "npm run generate-parser && node test.js",
+    "start": "node main.js",
     "generate-parser": "java -jar ../lib/antlr-4.13.1-complete.jar -Dlanguage=JavaScript -visitor ./parser/FloorBuilderLexer.g4 ./parser/FloorBuilderParser.g4 -o ./gen/parser -lib ./gen/parser",
-    "test": "node test.js"
+    "test": "node main.js"
   },
   "dependencies": {
     "antlr4": "^4.13.1-patch-1"

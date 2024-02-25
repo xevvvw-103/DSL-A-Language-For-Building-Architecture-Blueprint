@@ -1,4 +1,4 @@
-gen/
+
 .antlr
 node_modules
 .idea/*
