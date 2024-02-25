@@ -51,7 +51,7 @@ export default class Checker extends BaseVisitor {
     if (overlapping) {
       throw new Error(`Add to Room: Object with name ${objectName} cannot be placed at (${v.x}, ${v.y}) in room ${v.target} due to overlapping.`);
     } else {
-      c[objectName].placements.push({target: v.target, x: v.x, y: v.y});
+      c[objectName].placements.push({target: v.target, x: v.x, y: v.y, width: c[objectName].width, height: c[objectName].height});
     }
   }
   visitAddToFloor(v, c) {
@@ -71,7 +71,7 @@ export default class Checker extends BaseVisitor {
     if (overlapping) {
       throw new Error(`Add to Floor: Object with name ${objectName} cannot be placed at (${v.x}, ${v.y}) due to overlapping.`);
     } else {
-      c[objectName].placements.push({target: 'FLOOR', x: v.x, y: v.y});
+      c[objectName].placements.push({target: 'FLOOR', x: v.x, y: v.y, width: c[objectName].width, height: c[objectName].height});
     }
   }
   visitResizeStatement(v, c) {
@@ -201,9 +201,9 @@ function doRectanglesOverlap(obj, x, y, width, height, target) {
   if (!obj.placements) return false;
   return obj.placements.some((placement) => {
     // Check for overlap in the x dimension
-    const xOverlap = x < placement.x + obj.width && x + width > placement.x;
+    const xOverlap = x < placement.x + placement.width && x + width > placement.x;
     // Check for overlap in the y dimension
-    const yOverlap = y < placement.y + obj.height && y + height > placement.y;
+    const yOverlap = y < placement.y + placement.height && y + height > placement.y;
     // Return true if there is overlap in both dimensions
     return placement.target === target && xOverlap && yOverlap;
   });
