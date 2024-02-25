@@ -15,6 +15,28 @@
 	}
 
 	onMount(async () => {
+		function drawImage(img: any, item: any) {
+			ctx.setTransform(1, 0, 0, 1, item.position.x, item.position.y); // sets scale and origin
+			switch (item.direction) {
+				case "LEFT":
+					ctx.rotate(Math.PI / 2);
+					ctx.translate(0, -item.size.height);
+					break;
+				case "RIGHT":
+					ctx.rotate((3 * Math.PI) / 2);
+					ctx.translate(-item.size.width, 0);
+					break;
+				case "DOWN":
+					ctx.rotate(Math.PI);
+					ctx.translate(-item.size.width, -item.size.height);
+					break;
+				case "UP":
+					ctx.rotate(0);
+					break;
+			}
+			ctx.drawImage(img, 0, 0, item.size.width, item.size.height);
+		}
+
 		let ctx = initCanvas(canvas);
 		let roomCtx = initCanvas(roomCanvas);
 		if (!roomCtx) {
@@ -24,15 +46,22 @@
 
 		let json = await fetch("src/lib/test.json").then((r) => r.json());
 		console.log(json[0]);
-		json.forEach((room: any) => {
-			room.furniture.forEach((obj: any) => {
+
+		json.forEach((item: any) => {
+			if (item.type === "room") {
+				ctx.strokeRect(
+					item.position.x,
+					item.position.y,
+					item.size.width,
+					item.size.height,
+				);
+			} else {
 				let img = new Image();
-				img.src = "src/lib/images/" + obj.type + ".png";
-				img.onload = function () {
-					ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
+				img.src = "src/lib/images/" + item.type + ".png";
+				img.onload = () => {
+					drawImage(img, item);
 				};
-			});
-			roomCtx.strokeRect(room.x, room.y, room.width, room.height);
+			}
 		});
 	});
 </script>
