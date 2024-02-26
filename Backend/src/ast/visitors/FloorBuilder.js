@@ -92,6 +92,15 @@ export default class FloorBuilder extends BaseVisitor {
       } 
     }
 
+    var child_height_check = child_height;
+    var child_width_check = child_width;
+
+    if(v.direction == ast.DIRECTION.RIGHT || v.direction == ast.DIRECTION.LEFT) {
+      child_height_check = child_width;
+      child_width_check = child_height;
+      // Also modify all children
+    }
+
     if (child_type == ast.OBJECT_TYPE.ROOM) {
       // add room to room
 
@@ -110,6 +119,31 @@ export default class FloorBuilder extends BaseVisitor {
           });
           break;
         } 
+      }
+
+      // update floor_list childs info
+      for (let i = 0; i < FloorBuilder.floor_list.length; i++) {
+        if (FloorBuilder.floor_list[i].name == v.target &&
+          FloorBuilder.floor_list[i].dirty == false &&
+          // room_width >= child_x + child_width
+          FloorBuilder.floor_list[i].width >= v.x + child_width_check &&
+          // room_height >= child_y + child_height
+          FloorBuilder.floor_list[i].height >= v.y + child_height_check) {
+          FloorBuilder.floor_list[i].childs.push({ 
+            name: v.name, 
+            width: child_width, 
+            height: child_height, 
+            x: v.x, 
+            y: v.y, 
+            type: child_type, 
+            direction: v.direction, 
+            dirty: false,
+            childs: child_childs
+          });
+          addable = true;
+          console.log(child_type.toUpperCase() + ' ' + v.name + ' is added to ROOM ' + v.target + '.');
+          break;
+        }
       }
     } else {
       // add furniture to room
@@ -136,9 +170,9 @@ export default class FloorBuilder extends BaseVisitor {
         if (FloorBuilder.floor_list[i].name == v.target &&
           FloorBuilder.floor_list[i].dirty == false &&
           // room_width >= child_x + child_width
-          FloorBuilder.floor_list[i].width >= v.x + child_width &&
+          FloorBuilder.floor_list[i].width >= v.x + child_width_check &&
           // room_height >= child_y + child_height
-          FloorBuilder.floor_list[i].height >= v.y + child_height) {
+          FloorBuilder.floor_list[i].height >= v.y + child_height_check) {
           FloorBuilder.floor_list[i].childs.push({ 
             name: v.name, 
             width: child_width, 
