@@ -17,7 +17,7 @@ export default class FloorBuilder extends BaseVisitor {
 
   // output all inforamtion in JSON to .txt file
   buildFloor(p) {
-    const filePath = '../arch/src/lib/test.json';
+    const filePath = '../../Frontend/arch/src/lib/output.json';
 
     p.accept(this, null);
 
