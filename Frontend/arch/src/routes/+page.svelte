@@ -20,18 +20,18 @@
 			switch (item.direction) {
 				case "LEFT":
 					ctx.rotate(Math.PI / 2);
-					ctx.translate(0, -item.size.height);
+					ctx.translate(0, -item.size.width);
 					break;
 				case "RIGHT":
 					ctx.rotate((3 * Math.PI) / 2);
-					ctx.translate(-item.size.width, 0);
+					ctx.translate(-item.size.height, 0);
 					break;
 				case "DOWN":
 					ctx.rotate(0);
 					break;
 				case "UP":
 					ctx.rotate(Math.PI);
-					ctx.translate(-item.size.width, -item.size.height);
+					ctx.translate(-item.size.height, -item.size.width);
 					break;
 			}
 			ctx.drawImage(img, 0, 0, item.size.height, item.size.width);
