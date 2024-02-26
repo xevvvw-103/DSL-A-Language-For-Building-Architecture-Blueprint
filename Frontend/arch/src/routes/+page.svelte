@@ -20,21 +20,28 @@
 			switch (item.direction) {
 				case "LEFT":
 					ctx.rotate(Math.PI / 2);
-					ctx.translate(0, -item.size.width);
+					ctx.translate(0, -item.size.height);
 					break;
 				case "RIGHT":
 					ctx.rotate((3 * Math.PI) / 2);
-					ctx.translate(-item.size.height, 0);
+					ctx.translate(-item.size.width, 0);
 					break;
 				case "DOWN":
 					ctx.rotate(0);
 					break;
 				case "UP":
 					ctx.rotate(Math.PI);
-					ctx.translate(-item.size.height, -item.size.width);
+					ctx.translate(-item.size.width, -item.size.height);
 					break;
 			}
-			ctx.drawImage(img, 0, 0, item.size.height, item.size.width);
+			console.log(
+				"Drawing",
+				item.type,
+				"facing " + item.direction,
+				item.position.x,
+				item.position.y,
+			);
+			ctx.drawImage(img, 0, 0, item.size.width, item.size.height);
 		}
 
 		let ctx = initCanvas(canvas);
