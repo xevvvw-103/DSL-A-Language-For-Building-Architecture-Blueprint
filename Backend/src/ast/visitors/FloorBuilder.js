@@ -3,16 +3,16 @@ import * as ast from "../index.js";
 import * as fs from 'fs';
 import * as path from 'path';
 
-
 export default class FloorBuilder extends BaseVisitor {
   // Objects declared by Make_Statement
   // declared_objects = [object]
-  // object = {name: , width: , height: , type: }
+  // object: {name: , width: , height: , type: , childs: [child]}
+  // child: {name: , width: , height: , x: , y: , type: , direction: , childs: [child]}
   static declared_objects = [];
 
   // Items added to FLOOR
   // floor_list = [item]
-  // item: {name: , width: , height: , x: , y: , type: , direction: , childs: [item]}
+  // item: {name: , width: , height: , x: , y: , type: , direction: , dirty: , childs: [item]}
   static floor_list = [];
 
   // output all inforamtion in JSON to .txt file
@@ -22,38 +22,8 @@ export default class FloorBuilder extends BaseVisitor {
     p.accept(this, null);
 
     let rawdata = [];
-    for (let i = 0; i < FloorBuilder.floor_list.length; i++) {
-      let non_child_entry = {
-        type: FloorBuilder.floor_list[i].type,
-        position: {
-          x: FloorBuilder.floor_list[i].x,
-          y: FloorBuilder.floor_list[i].y
-        },
-        size: {
-          width: FloorBuilder.floor_list[i].width,
-          height: FloorBuilder.floor_list[i].height
-        },
-        direction: FloorBuilder.floor_list[i].direction
-      };
-      rawdata.push(non_child_entry);
+    this.parseToJson(FloorBuilder.floor_list, 0, 0, rawdata);
 
-      for (let j = 0; j < FloorBuilder.floor_list[i].childs.length; j++) {
-        let child_entry = {
-          type: FloorBuilder.floor_list[i].childs[j].type,
-          position: {
-            x: FloorBuilder.floor_list[i].x + FloorBuilder.floor_list[i].childs[j].x,
-            y: FloorBuilder.floor_list[i].y + FloorBuilder.floor_list[i].childs[j].y
-          },
-          size: {
-            width: FloorBuilder.floor_list[i].childs[j].width,
-            height: FloorBuilder.floor_list[i].childs[j].height
-          },
-          direction: FloorBuilder.floor_list[i].childs[j].direction
-        }
-        rawdata.push(child_entry);
-      }
-    }
-    
     let outputData = JSON.stringify(rawdata);
     // Checking if the file exists
     fs.access(filePath, fs.constants.F_OK, (err) => {
@@ -87,6 +57,7 @@ export default class FloorBuilder extends BaseVisitor {
         });
       }
     });
+
   }
 
   visitProgram(p, t) {
@@ -94,39 +65,96 @@ export default class FloorBuilder extends BaseVisitor {
   }
 
   visitMakeRoom(v, t) {
-    FloorBuilder.declared_objects.push({ name: v.name, width: v.width, height: v.height, type: ast.OBJECT_TYPE.ROOM });
+    FloorBuilder.declared_objects.push({ name: v.name, width: v.width, height: v.height, type: ast.OBJECT_TYPE.ROOM, childs: [] });
     console.log('ROOM ' + v.name + " is created.");
   }
 
   visitMakeFurniture(v, t) {
-    FloorBuilder.declared_objects.push({ name: v.name, width: v.width, height: v.height, type: v.furintureType });
+    FloorBuilder.declared_objects.push({ name: v.name, width: v.width, height: v.height, type: v.furintureType, childs: [] });
     console.log(v.furintureType.toUpperCase() + ' ' + v.name + " is created.");
   }
 
   visitAddToRoom(v, t) {
     let addable = false;
+      // declared_objects = [object]
+  // object: {name: , width: , height: , type: , childs: [child]}
+  // child: {name: , width: , height: , x: , y: , type: , direction: , childs: [child]}
 
+      // floor_list = [item]
+  // item: {name: , width: , height: , x: , y: , type: , direction: , dirty: , childs: [item]}
     for (let i = 0; i < FloorBuilder.declared_objects.length; i++) {
       if (FloorBuilder.declared_objects[i].name == v.name) {
         var child_width = FloorBuilder.declared_objects[i].width;
         var child_height = FloorBuilder.declared_objects[i].height;
         var child_type = FloorBuilder.declared_objects[i].type;
+        var child_childs = FloorBuilder.declared_objects[i].childs;
         break;
-      }
+      } 
     }
-    // floor_list = [item]
-    // item: {name: , width: , height: , x: , y: , type: , direction: , childs: [item]}
-    for (let i = 0; i < FloorBuilder.floor_list.length; i++) {
-      if (FloorBuilder.floor_list[i].name == v.target &&
-        // room_width >= child_x + child_width
-        FloorBuilder.floor_list[i].width >= v.x + child_width &&
-        // room_height >= child_y + child_height
-        FloorBuilder.floor_list[i].height >= v.y + child_height) {
-        var child_list = FloorBuilder.floor_list[i].childs;
-        child_list.push({ name: v.name, width: child_width, height: child_height, x: v.x, y: v.y, type: child_type, direction: v.direction, childs: [] });
-        addable = true;
-        console.log(child_type.toUpperCase() + ' ' + v.name + ' is added to ROOM ' + v.target + '.');
-        break;
+
+    if (child_type == ast.OBJECT_TYPE.ROOM) {
+      // add room to room
+
+      // update declared_objects childs info
+      for (let i = 0; i < FloorBuilder.declared_objects.length; i++) {
+        if (FloorBuilder.declared_objects[i].name == v.target) {
+          FloorBuilder.declared_objects[i].childs.push({
+            name: v.name, 
+            width: child_width, 
+            height: child_height, 
+            x: v.x, 
+            y: v.y, 
+            type: child_type, 
+            direction: v.direction, 
+            childs: child_childs
+          });
+          break;
+        } 
+      }
+    } else {
+      // add furniture to room
+
+      // update declared_objects childs info
+      for (let i = 0; i < FloorBuilder.declared_objects.length; i++) {
+        if (FloorBuilder.declared_objects[i].name == v.target) {
+          FloorBuilder.declared_objects[i].childs.push({
+            name: v.name, 
+            width: child_width, 
+            height: child_height, 
+            x: v.x, 
+            y: v.y, 
+            type: child_type, 
+            direction: v.direction, 
+            childs: []
+          });
+          break;
+        } 
+      }
+
+      // update floor_list childs info
+      for (let i = 0; i < FloorBuilder.floor_list.length; i++) {
+        if (FloorBuilder.floor_list[i].name == v.target &&
+          FloorBuilder.floor_list[i].dirty == false &&
+          // room_width >= child_x + child_width
+          FloorBuilder.floor_list[i].width >= v.x + child_width &&
+          // room_height >= child_y + child_height
+          FloorBuilder.floor_list[i].height >= v.y + child_height) {
+          FloorBuilder.floor_list[i].childs.push({ 
+            name: v.name, 
+            width: child_width, 
+            height: child_height, 
+            x: v.x, 
+            y: v.y, 
+            type: child_type, 
+            direction: v.direction, 
+            dirty: false,
+            childs: [] 
+          });
+
+          addable = true;
+          console.log(child_type.toUpperCase() + ' ' + v.name + ' is added to ROOM ' + v.target + '.');
+          break;
+        }
       }
     }
 
@@ -139,10 +167,8 @@ export default class FloorBuilder extends BaseVisitor {
     let addable = false;
 
     for (let i = 0; i < FloorBuilder.declared_objects.length; i++) {
+      let type = FloorBuilder.declared_objects[i].type;
       if (FloorBuilder.declared_objects[i].name == v.name) {
-        // floor_list = [item]
-        // item: {name: , width: , height: , x: , y: , type: , direction: , childs: [item]}
-        var type = FloorBuilder.declared_objects[i].type;
         FloorBuilder.floor_list.push({
           name: v.name,
           width: FloorBuilder.declared_objects[i].width,
@@ -151,7 +177,8 @@ export default class FloorBuilder extends BaseVisitor {
           y: v.y,
           type: type,
           direction: v.direction,
-          childs: []
+          dirty: false,
+          childs: this.objectChildsToFloorChilds(FloorBuilder.declared_objects[i].childs)
         });
         console.log(type.toUpperCase() + ' ' + v.name + " is addded to FLOOR.");
         addable = true;
@@ -168,19 +195,74 @@ export default class FloorBuilder extends BaseVisitor {
     let resizable = false;
 
     for (let i = 0; i < FloorBuilder.declared_objects.length; i++) {
-      if (FloorBuilder.declared_objects[i].name == v.name) {
+      if (FloorBuilder.declared_objects[i].name == v.name && FloorBuilder.declared_objects[i].type == ast.OBJECT_TYPE.ROOM) {
+        // resize room and all items inside
+        let old_width = FloorBuilder.declared_objects[i].width;
+        let old_height = FloorBuilder.declared_objects[i].height;
+
+        let x_ratio = v.width / old_width;
+        let y_ratio = v.height / old_height;
+
+        let new_childs = this.resizeChilds(FloorBuilder.declared_objects[i].childs, x_ratio, y_ratio);
+
+        let entry = {
+          name: v.name,
+          width: v.width,
+          height: v.height,
+          type: FloorBuilder.declared_objects[i].type,
+          childs: new_childs
+        };
+
+        FloorBuilder.declared_objects.splice(i, 1);
+        FloorBuilder.declared_objects.push(entry);
+
+        // Change dirty bit to true
+        for (let j = 0; j < FloorBuilder.floor_list.length; j++) {
+          if (FloorBuilder.floor_list[j].name == v.name) {
+            FloorBuilder.floor_list[j].dirty = true;
+          }
+        }
+        console.log(FloorBuilder.declared_objects[i].type.toUpperCase() + ' ' + v.name + ' is resized.');
+        resizable = true;
+        break;
+      } else if (FloorBuilder.declared_objects[i].name == v.name && FloorBuilder.declared_objects[i].type != ast.OBJECT_TYPE.ROOM) {
+        // resize furniture only
         FloorBuilder.declared_objects[i].width = v.width;
         FloorBuilder.declared_objects[i].height = v.height;
         console.log(FloorBuilder.declared_objects[i].type.toUpperCase() + ' ' + v.name + ' is resized.');
-        //console.log('declared objects ' + FloorBuilder.declared_objects);
         resizable = true;
         break;
       }
-    }
+    } 
 
     if (!resizable) {
       console.log('RESIZE ERROR: ' + v.name + ' does not exist.');
     }
+  }
+
+  resizeChilds(list, x_ratio, y_ratio) {
+    let resizedChildren = [];
+  
+    list.forEach((entry) => {
+      let resizedChild = {
+        name: entry.name,
+        width: entry.width * x_ratio,
+        height: entry.height * y_ratio,
+        x: entry.x * x_ratio,
+        y: entry.y * y_ratio,
+        type: entry.type,
+        direction: entry.direction,
+      };
+  
+      if (entry.childs) {
+        // Recursively resize child's child objects
+        resizedChild.childs = this.resizeChilds(entry.childs, x_ratio, y_ratio);
+      }
+  
+      resizedChildren.push(resizedChild);
+    });
+  
+    return resizedChildren;
   }
 
   visitRepeatStatement(v, t) {
@@ -219,10 +301,9 @@ export default class FloorBuilder extends BaseVisitor {
         }
         break;
       case ast.DIRECTION.RIGHT:
-        if (v.repeatableStatement.target && (times == 0 || Math.floor((room_width - v.repeatableStatement.x) / child_width) < times)) 
-        {
+        if (v.repeatableStatement.target && (times == 0 || Math.floor((room_width - v.repeatableStatement.x) / child_width) < times)) {
           times = Math.floor((room_width - v.repeatableStatement.x) / child_width);
-        } 
+        }
         for (let i = 0; i < times; i++) {
           v.repeatableStatement.accept(this, null);
           v.repeatableStatement.x += child_width;
@@ -244,8 +325,7 @@ export default class FloorBuilder extends BaseVisitor {
 
   visitRemoveFromFloor(v, t) {
     let removable = false;
-    // floor_list = [item]
-    // item: {name: , width: , height: , x: , y: , type: , direction: , childs: [item]}
+
     for (let i = 0; i < FloorBuilder.floor_list.length; i++) {
       if (FloorBuilder.floor_list[i].name == v.target && FloorBuilder.floor_list[i].x == v.x && FloorBuilder.floor_list[i].y == v.y) {
         var type = FloorBuilder.floor_list[i].type;
@@ -264,24 +344,69 @@ export default class FloorBuilder extends BaseVisitor {
   visitRemoveFromRoom(v, t) {
     let removable = false;
 
-    // floor_list = [item]
-    // item: {name: , width: , height: , x: , y: , type: , direction: , childs: [item]}
-    for (let i = 0; i < FloorBuilder.floor_list.length; i++) {
-      if (FloorBuilder.floor_list[i].name == v.base) {
-        for (let j = 0; j < FloorBuilder.floor_list[i].childs.length; j++) {
-          if (FloorBuilder.floor_list[i].childs[j].name == v.target && FloorBuilder.floor_list[i].childs[j].x == v.x && FloorBuilder.floor_list[i].childs[j].y == v.y) {
-            var type = FloorBuilder.floor_list[i].childs[j].type;
-            FloorBuilder.floor_list[i].childs.splice(j, 1);
+    this.searchFurniture(FloorBuilder.floor_list, v.target, v.base, v.x, v.y);
+
+    if (!removable) {
+      console.log('REMOVE ERROR: ' + v.target + ' does not exist in ROOM ' + v.base + '.');
+    }
+  }
+
+  searchFurniture(list, child_name, parent_name, x, y) {
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].name == parent_name) {
+        for (let j = 0; j < list[i].childs.length; j++) {
+          if (list[i].childs[j].name == child_name && list[i].childs[j].x == x && list[i].childs[j].y == y) {
+            var type = list[i].childs[j].type;
+            list[i].childs.splice(j, 1);
             removable = true;
             console.log(type.toUpperCase() + ' ' + v.target + ' is removed from ROOM ' + v.base);
             break;
           }
         }
+      } else {
+        this.searchFurniture(list.childs, child_name, parent_name, x, y);
       }
     }
+  }
 
-    if (!removable) {
-      console.log('REMOVE ERROR: ' + v.target + ' does not exist in ROOM ' + v.base + '.');
-    }
+  objectChildsToFloorChilds(childs) {
+    let new_childs = [];
+    childs.forEach((child) => {
+      new_childs.push({
+        name: child.name,
+        width: child.width,
+        height: child.height,
+        x: child.x,
+        y: child.y,
+        type: child.type,
+        direction: child.direction,
+        dirty: false,
+        childs: this.objectChildsToFloorChilds(child.childs)
+      });
+    });
+    return new_childs;
+  }
+
+  parseToJson(list, acc_x, acc_y, output) {
+    list.forEach((item) => {
+      let entry = {
+        type: item.type,
+        position: {
+          x: item.x + acc_x,
+          y: item.y + acc_y,
+        },
+        size: {
+          width: item.width,
+          height: item.height
+        },
+        direction: item.direction
+      };
+      output.push(entry);
+
+      let new_acc_x = item.x + acc_x;
+      let new_acc_y = item.y + acc_y;
+
+      this.parseToJson(item.childs, new_acc_x, new_acc_y, output);
+    })
   }
 }

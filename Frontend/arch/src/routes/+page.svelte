@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	let width = 1000;
-	let height = 1000;
+	let width = 5000;
+	let height = 5000;
 	let canvas: HTMLCanvasElement;
 	let roomCanvas: HTMLCanvasElement;
 
