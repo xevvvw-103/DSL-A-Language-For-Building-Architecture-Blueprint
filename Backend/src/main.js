@@ -10,7 +10,7 @@ import Checker from "./ast/visitors/Checker.js";
 import FloorBuilder from "./ast/visitors/FloorBuilder.js";
 
 // read from input
-const inputFilePath = './input.txt';
+const inputFilePath = './complex_input.txt';
 let content = fs.readFileSync(inputFilePath, {encoding: 'utf-8'});
 console.log("read from input " + inputFilePath);
 

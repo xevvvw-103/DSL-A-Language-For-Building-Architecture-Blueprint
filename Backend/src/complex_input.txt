@@ -13,7 +13,7 @@ ADD desk TO dormitory AT 0,0 FACING DOWN
 ADD c1 TO dormitory AT 25,30 FACING UP
 
 MAKE chair NAMED toilet SIZE 20,20
-MAKE table NAMED sink SIZE 10,30
+MAKE table NAMED sink SIZE 30,10
 
 ADD bathroom TO dormitory AT 150,50 FACING UP
 ADD toilet TO bathroom AT 30,80 FACING LEFT
