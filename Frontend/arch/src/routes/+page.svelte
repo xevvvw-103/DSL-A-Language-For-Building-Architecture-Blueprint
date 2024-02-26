@@ -34,7 +34,7 @@
 					ctx.translate(-item.size.width, -item.size.height);
 					break;
 			}
-			ctx.drawImage(img, 0, 0, item.size.width, item.size.height);
+			ctx.drawImage(img, 0, 0, item.size.height, item.size.width);
 		}
 
 		let ctx = initCanvas(canvas);
