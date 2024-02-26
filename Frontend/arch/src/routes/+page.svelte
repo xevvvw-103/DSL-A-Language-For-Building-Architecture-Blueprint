@@ -44,7 +44,7 @@
 		}
 		roomCtx.lineWidth = 3;
 
-		let json = await fetch("src/lib/test.json").then((r) => r.json());
+		let json = await fetch("src/lib/output.json").then((r) => r.json());
 		console.log(json[0]);
 
 		json.forEach((item: any) => {
