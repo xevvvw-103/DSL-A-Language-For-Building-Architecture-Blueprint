@@ -14,3 +14,33 @@
 7. Run `npm start` and you will see rendered images at `http://localhost:5173/`
 
 ## Syntax of DSL
+
+- `OBJECT_TYPE`:
+    - room
+    - chari
+    - bed
+    - couch
+    - table
+
+- `DIRECTION`:
+    - LEFT
+    - RIGHT
+    - UP 
+    - DOWN
+
+- `NUMMBER`: Natural Number
+
+- `MAKE` Statement
+    - `MAKE` `OBJECT_TYPE` `NAMED` name `SIZE` width,height
+- `ADD` Statement
+    - `ADD` child_name `TO` parent_name/FLOOR `AT` relative_x,relative_y `FACING` `DIRECTION`  
+- `RESIZE` Statement
+    - `RESIZE` name width,height
+- `REPEAT` Statement
+    - `REPEAT`  `DIRECTION` `ADD` Statement
+    - `REPEAT` `NUMBER TIMES`  `DIRECTION` `ADD` Statement
+- `REMOVE` Statement
+    - `REMOVE` child_name `FROM` parent_name/FLOOR `AT` relative_x,relative_y
+
+
+
