@@ -42,5 +42,19 @@
 - `REMOVE` Statement
     - `REMOVE` child_name `FROM` parent_name/FLOOR `AT` relative_x,relative_y
 
+## Samples
 
+```
+MAKE room NAMED br1 SIZE 200*500 AT (x,y)
 
+MAKE chair NAMED c1 SIZE 50*50
+MAKE bed NAMED b1 SIZE 100*150
+MAKE table NAMED t1 SIZE 50*50
+MAKE table NAMED t2 SIZE 80*80
+
+ADD b1 TO br1 AT (x,y) FACING DOWN
+ADD t1 TO br1 AT (x+100, y) FACING DOWN
+ADD t2 TO br1 AT (x, y+420) FACING DOWN
+ADD c1 TO br1 AT (x+15, y+370) FACING DOWN
+```
+![sample output](./check-ins/check-in%203%20related/bedroom1.png)
